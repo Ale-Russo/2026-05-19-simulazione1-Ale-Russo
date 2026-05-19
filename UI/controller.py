@@ -15,23 +15,20 @@ class Controller:
                                                                   key = g["GenreId"]))
 
     def handleCreaGrafo(self, e):
-        self._view._txt_result.options.clear()
+        self._view.txt_result.controls.clear()
         genere = self._view._ddGenre.value
         if genere is None:
-            self._view._txt.result.options.append(ft.Text("Inserire um genere.", color="red"))
+            self._view.txt_result.controls.append(ft.Text("Inserire un genere musicale.", color="red"))
             self._view.update_page()
             return
 
-        self._model.creaGrafo(genere)
+        self._model.creaGrafo(int(genere))
         self._view._ddArtist.options.clear()
         for a in self._model._graph.nodes:
             self._view._ddArtist.options.append(ft.dropdown.Option(text = a.Name,
                                                                    key = str(a.ArtistId)))
         self._view.update_page()
 
-
-    def handleCreaGrafo(self,e):
-        pass
 
     def handleCammino(self,e):
         pass
