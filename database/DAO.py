@@ -70,3 +70,43 @@ class DAO():
         cursor.close()
         conn.close()
         return result
+
+    @staticmethod
+    def getPopularity():
+        conn = DBConnect.get_connection()
+        result = []
+        cursor = conn.cursor(dictionary=True)
+
+        query = """select distinct ar.ArtistId, sum(i.Quantity) as Popolarita
+                    from artist ar,album al,track t, invoiceline i 
+                    where ar.ArtistId = al.ArtistId
+                    and t.AlbumId = al.AlbumId
+                    and t.TrackId = i.TrackId
+                    group by ar.ArtistId"""
+
+        cursor.execute(query)
+        for row in cursor:
+            result.append(row)
+        cursor.close()
+        conn.close()
+        return result
+
+    @staticmethod
+    def getAcquisti():
+        conn = DBConnect.get_connection()
+        result = []
+        cursor = conn.cursor(dictionary=True)
+
+        query = """select i.CustomerId, a.ArtistId
+                    from invoice i, invoiceline iv, track t, album a
+                    where i.InvoiceId = iv.InvoiceId
+                    and iv.TrackId = t.TrackId
+                    and t.AlbumId = a.AlbumId
+                    group by i.CustomerId, a.ArtistId"""
+
+        cursor.execute(query)
+        for row in cursor:
+            result.append(row)
+        cursor.close()
+        conn.close()
+        return result

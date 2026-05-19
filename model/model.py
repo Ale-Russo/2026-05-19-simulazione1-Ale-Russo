@@ -6,9 +6,14 @@ class Model:
     def __init__(self):
         self._graph = nx.DiGraph()
         self._artisti = DAO.getAllArtists()
+        self._pop = DAO.getPopularity()
         self._idMapArtisti = {}
+        self._popMap = {}
         for a in self._artisti:
             self._idMapArtisti[a.ArtistId] = a
+        for p in self._pop:
+            self._popMap[p[0]] = p[1]
+
 
 
     def getAllGeneri(self):
