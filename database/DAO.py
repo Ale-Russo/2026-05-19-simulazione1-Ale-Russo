@@ -49,26 +49,23 @@ class DAO():
         return result
 
     @staticmethod
-    def getAllNodes(n, idMapA):
+    def getAllNodes(genreId, idMapA):
         conn = DBConnect.get_connection()
 
         result = []
 
         cursor = conn.cursor(dictionary=True)
-        query = """SELECT t.ID, t.IATA_CODE, count(*) as N
-                        FROM (select a.ID, a.IATA_CODE, f.AIRLINE_ID, count(*)
-                        from airports a, flights f
-                        where a.ID = f.ORIGIN_AIRPORT_ID 
-                        or a.ID = f.DESTINATION_AIRPORT_ID 
-                        GROUP BY a.ID, a.IATA_CODE, f.AIRLINE_ID ) t
-                        GROUP BY t.ID, t.IATA_CODE
-                        having N >= %s
-                        order by N asc"""
 
-        cursor.execute(query, (n,))
+        query = """select distinct ar.ArtistId 
+                    from artist ar, album al, track t 
+                    where ar.ArtistId = al.ArtistId and 
+                    t.AlbumId = al.AlbumId 
+                    and t.GenreId = %s"""
+
+        cursor.execute(query, (genreId,))
 
         for row in cursor:
-            result.append(idMapA[row["ID"]])
+            result.append(idMapA[row["ArtistId"]])
 
         cursor.close()
         conn.close()
