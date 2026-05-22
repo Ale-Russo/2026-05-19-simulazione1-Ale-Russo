@@ -72,7 +72,7 @@ class DAO():
         return result
 
     @staticmethod
-    def getPopularity():
+    def getPopularity(genere):
         conn = DBConnect.get_connection()
         result = []
         cursor = conn.cursor(dictionary=True)
@@ -82,9 +82,10 @@ class DAO():
                     where ar.ArtistId = al.ArtistId
                     and t.AlbumId = al.AlbumId
                     and t.TrackId = i.TrackId
+                    and t.GenreId = %s
                     group by ar.ArtistId"""
 
-        cursor.execute(query)
+        cursor.execute(query, (genere,))
         for row in cursor:
             result.append(row)
         cursor.close()
@@ -92,7 +93,7 @@ class DAO():
         return result
 
     @staticmethod
-    def getAcquisti():
+    def getAcquisti(genere):
         conn = DBConnect.get_connection()
         result = []
         cursor = conn.cursor(dictionary=True)
@@ -102,11 +103,12 @@ class DAO():
                     where i.InvoiceId = iv.InvoiceId
                     and iv.TrackId = t.TrackId
                     and t.AlbumId = a.AlbumId
+                    and t.GenreId = %s
                     group by i.CustomerId, a.ArtistId"""
 
-        cursor.execute(query)
+        cursor.execute(query, (genere,))
         for row in cursor:
-            result.append(row)
+            result.append((row["CustomerId"], row["ArtistId"]))
         cursor.close()
         conn.close()
         return result
