@@ -27,6 +27,17 @@ class Controller:
         for a in self._model._graph.nodes:
             self._view._ddArtist.options.append(ft.dropdown.Option(text = a.Name,
                                                                    key = str(a.ArtistId)))
+
+        self._view.txt_result.controls.clear()
+        nnodi, narchi, bestA, bestP, bestFive = self._model.dettagliGrafo(self._model._graph)
+        self._view.txt_result.controls.append(ft.Text("Grafo correttamente creato"))
+        self._view.txt_result.controls.append(ft.Text(f"Numero di nodi: {nnodi}"))
+        self._view.txt_result.controls.append(ft.Text(f"Numero di archi: {narchi}"))
+        self._view.txt_result.controls.append(ft.Text(f"Artista più influente: {bestA}, con influenza: {bestP}"))
+        self._view.txt_result.controls.append(ft.Text("Top 5 archi:"))
+        for arco in bestFive:
+            self._view.txt_result.controls.append(ft.Text(f"{arco[0]} --> {arco[1]}: {arco[2]["weight"]}"))
+
         self._view.update_page()
 
 

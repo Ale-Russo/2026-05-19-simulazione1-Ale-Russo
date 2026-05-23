@@ -1,3 +1,5 @@
+from random import betavariate
+
 from database.DAO import DAO
 import networkx as nx
 
@@ -21,6 +23,18 @@ class Model:
     def getAllNodes(self, GenreId, idMapA):
         artisti = DAO.getAllNodes(GenreId,idMapA)
         return artisti
+
+    def buildDicts(self, GenreId):
+        self._pop = DAO.getPopularity(GenreId)
+        for p in self._pop:
+            self._popMap[p["ArtistId"]] = int(p["Popolarita"])
+        self._prova = DAO.getAcquisti(GenreId)
+        for coppia in self._prova:
+            if coppia[1] in self._clientiArtisti:
+                self._clientiArtisti[coppia[1]].add(coppia[0])
+            else:
+                self._clientiArtisti[coppia[1]] = {coppia[0]}
+
 
     def addAllEdges(self, Artisti):
         for i in range(len(Artisti)):
@@ -54,18 +68,31 @@ class Model:
 
     def creaGrafo(self,GenreId):
         self._graph.clear()
-        self._pop = DAO.getPopularity(GenreId)
-        for p in self._pop:
-            self._popMap[p["ArtistId"]] = int(p["Popolarita"])
-        self._prova = DAO.getAcquisti(GenreId)
-        for coppia in self._prova:
-            if coppia[1] in self._clientiArtisti:
-                self._clientiArtisti[coppia[1]].add(coppia[0])
-            else:
-                self._clientiArtisti[coppia[1]] = {coppia[0]}
+        self.buildDicts(GenreId)
         nodi_validi = self.getAllNodes(GenreId, self._idMapArtisti)
         self._graph.add_nodes_from(nodi_validi)
         self.addAllEdges(nodi_validi)
+
+    def dettagliGrafo(self, grafo):
+        nnodi = len(grafo.nodes)
+        narchi = len(grafo.edges)
+        archi = grafo.edges(data=True)
+        archiOrdinati = sorted(archi, key = lambda x: x[2]["weight"], reverse = True)
+        bestFive= archiOrdinati[:5]
+        bestA = None
+        bestP = 0
+        for a in grafo.nodes:
+            entranti = grafo.in_degree(a, weight = "weight")
+            uscenti = grafo.out_degree(a, weight = "weight")
+            influenza = uscenti-entranti
+            if influenza > bestP:
+                bestP = influenza
+                bestA = a
+
+        #print(bestFive)
+
+        return nnodi, narchi, bestA, bestP, bestFive
+
 
 
 
